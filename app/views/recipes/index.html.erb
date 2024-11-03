@@ -7,14 +7,15 @@
       <% recipes.each do |recipe| %>
         <div>
           <h3 class="font-bold text-md text-gray-900">
-          <%= recipe.title %> <%= recipe.rating %>
+            <%= link_to "#{recipe.title} (#{recipe.rating})", recipe_path(recipe) %>
           </h3>
 
+          <a href=<%= recipe_path(recipe) %>>
           <img
               alt="<%= recipe.title %>"
               src="<%= recipe.image_url %>"
               class="w-32 h-32 object-cover"
-          >
+          ></a>
 
           <div class="flex flex-row flex-wrap mt-2 text-gray-700">
             <% recipe.ingredients.each do |ingredient| %>

@@ -7,4 +7,10 @@ class RecipesController < ApplicationController
 
     render :index, locals: { recipes: recipes, ingredients: ingredients }
   end
+
+  def show
+    recipe = Recipe.includes(:ingredients).find(params[:id])
+
+    render :show, locals: { recipe: recipe }
+  end
 end

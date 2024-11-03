@@ -47,4 +47,16 @@ RSpec.describe 'Recipes', type: :request do
       end
     end
   end
+
+  context 'GET#show' do
+    it 'shows recipe details' do
+      category = create(:category)
+      recipe = create(:recipe, category: category)
+
+      get recipe_path(recipe)
+
+      expect(response).to have_http_status(200)
+      expect(response.body).to include(recipe.title)
+    end
+  end
 end
