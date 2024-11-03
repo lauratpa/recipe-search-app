@@ -8,6 +8,7 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.uncountable "beef"
   inflect.uncountable "butter"
   inflect.uncountable "buttermilk"
+  inflect.uncountable "breast"
   inflect.uncountable "broccoli"
   inflect.uncountable "broth"
   inflect.uncountable "cardamom"
@@ -44,9 +45,11 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.uncountable "meat"
   inflect.uncountable "milk"
   inflect.uncountable "mix"
+  inflect.uncountable "mozzarella"
   inflect.uncountable "mustard"
   inflect.uncountable "nutmeg"
   inflect.uncountable "oil"
+  inflect.uncountable "oregano"
   inflect.uncountable "pan"
   inflect.uncountable "pastry"
   inflect.uncountable "paste"
@@ -76,6 +79,7 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.uncountable "turkey"
   inflect.uncountable "ube"
   inflect.uncountable "vinegar"
+  inflect.uncountable "watermelon"
   inflect.uncountable "water"
   inflect.uncountable "yeast"
   inflect.uncountable "yogurt"
@@ -159,6 +163,8 @@ class TagExtractor
   ]
 
   IRREGULAR_MEASUREMENTS = [
+    "dash",
+    "dashes",
     "pinch",
     "pinches",
     "inch",
