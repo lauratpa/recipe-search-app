@@ -1,5 +1,5 @@
 <div class="container max-w-screen-xl">
-  <%= render partial: "recipes/search_bar", locals: { ingredients: ingredients } %>
+  <%= render partial: "recipes/search_bar", locals: { ingredients: ingredients, filter: filter } %>
 
   <div class="flex flex-col mt-10 px-5">
     <div class="block">
@@ -22,7 +22,7 @@
 
             <div class="flex flex-row flex-wrap mt-2 text-gray-700">
               <% recipe.ingredients.each do |ingredient| %>
-                <div class="text-xs border rounded-md px-2 py-1 <%= params[:ingredient_ids].to_a.include?(ingredient.id.to_s) ? 'bg-lime-300' : '' %>">
+                <div class="text-xs border rounded-md px-2 py-1 <%= filter.or_include?(ingredient.id) ? 'bg-lime-300' : '' %>">
                   <%= ingredient.name %>
                 </div>
               <% end %>

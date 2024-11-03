@@ -1,28 +1,28 @@
-<div class="bg-slate-400">
-  <div class="flex flex-row flex-wrap text-black-800">
-    <% params[:ingredient_ids].to_a.each do |ingredient_id| %>
-      <% ingredient_ids = params[:ingredient_ids].to_a.dup.difference([ingredient_id]) %>
+<div class="bg-slate-400 p-2">
+  <div class="flex flex-row flex-wrap text-black-800 mx-2">
+    <% filter.or.each do |ingredient_id| %>
+      <% new_filter = filter.new_without(or_id: ingredient_id) %>
 
       <div class="text-xs border rounded-md mx-2 pl-2 py-1 bg-lime-300 mt-2">
         <%= Ingredient.find(ingredient_id).name %>
-        <%= link_to "x", recipes_path(ingredient_ids: ingredient_ids), class: 'border rounded-md px-1 py-1 bg-red-200' %>
+        <%= link_to "x", recipes_path(new_filter.to_params), class: 'border rounded-md px-1 py-1 bg-red-200' %>
       </div>
-      <span class="content-center mt-2"><%= "or" if ingredient_id != params[:ingredient_ids].to_a.last %></span>
+      <span class="content-center mt-2"><%= "or" if ingredient_id != filter.or.last %></span>
     <% end %>
   </div>
 
   <div x-data="{ maybeSearchIsOpen: false }" class="mx-4 my-2">
     <button x-cloak x-show="!maybeSearchIsOpen" @click="maybeSearchIsOpen = true" type="button" class="items-center justify-center border rounded-md p-0.5 my-2 text-gray-900">
-      <span>Add optional ingredient</span>
+      <span>Add an optional ingredient</span>
     </button>
 
     <!-- Maybe search -->
-    <div x-cloak x-show="maybeSearchIsOpen" x-transition id="maybe-search">
+    <div x-cloak x-show="maybeSearchIsOpen" x-transition id="maybe-search" data-controller="search">
       <div class="flex flex-row space-x-2">
         <span class="p-0.5">Add an optional ingredient:</span>
 
-        <div data-controller="search">
-          <%= form_with url: search_ingredients_path(ingredient_ids: params[:ingredient_ids]), method: :post, data: { search_target: "form" }, class: "" do |form| %>
+        <div>
+          <%= form_with url: search_ingredients_path(filter.to_params), method: :post, data: { search_target: "form" }, class: "" do |form| %>
             <div>
               <%= form.text_field :search, data: { action: "search#search" }, autocomplete: "off", class: 'text-base p-0.5' %>
             </div>
@@ -35,7 +35,7 @@
       </div>
 
       <div data-search-target="results" class="mt-2">
-        <%= render partial: "ingredients/search_result", locals: { ingredients: ingredients } %>
+        <%= render partial: "ingredients/search_result", locals: { ingredients: ingredients, filter: filter } %>
       </div>
     </div>
   </div>

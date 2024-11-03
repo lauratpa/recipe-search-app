@@ -36,7 +36,7 @@ RSpec.describe 'Recipes', type: :request do
         oranges_recipe = create(:recipe, title: 'Oranges recipe', category: category)
           .tap { |recipe| recipe.ingredients << oranges }
 
-        get recipes_path, params: { ingredient_ids: [ bananas.id, oranges.id ] }
+        get recipes_path, params: { ingredient_ids: {  or: [ bananas.id, oranges.id ] } }
 
         expect(response).to have_http_status(200)
 
