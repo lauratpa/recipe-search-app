@@ -1,4 +1,31 @@
 <div class="flex flex-col">
+  <div>
+    <h3>Current search:</h3>
+    <div class="flex flex-row flex-wrap mt-2 text-gray-700">
+      <% params[:ingredient_ids].to_a.each do |ingredient_id| %>
+        <% ingredient_ids = params[:ingredient_ids].to_a.dup.difference([ingredient_id]) %>
+
+        <div class="text-xs border rounded-md mx-2 pm-0 pl-2 py-1 bg-lime-300">
+          <%= Ingredient.find(ingredient_id).name %>
+          <%= link_to "x", recipes_path(ingredient_ids: ingredient_ids), class: 'border rounded-md px-1 py-0.5 bg-red-200' %>
+        </div>
+        <%= "or" if ingredient_id != params[:ingredient_ids].to_a.last %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="block my-4" data-controller="search">
+    <%= form_with url: search_ingredients_path(ingredient_ids: params[:ingredient_ids]), method: :post, data: { search_target: "form" } do |form| %>
+      <div>
+        <%= form.text_field :search, data: { action: "search#search" }, autocomplete: "off" %>
+      </div>
+    <% end %>
+
+    <div data-search-target="results">
+      <%= render partial: "ingredients/search_result", locals: { ingredients: ingredients } %>
+    </div>
+  </div>
+
   <div class="block">
     <h1 class="font-bold text-2xl">Recipe Search</h1>
   </div>
@@ -26,17 +53,5 @@
           </div>
         </div>
       <% end %>
-  </div>
-
-  <div class="block" data-controller="search">
-    <%= form_with url: search_ingredients_path(ingredient_ids: params[:ingredient_ids]), method: :post, data: { search_target: "form" } do |form| %>
-      <div>
-        <%= form.text_field :search, data: { action: "search#search" }, autocomplete: "off" %>
-      </div>
-    <% end %>
-
-    <div data-search-target="results">
-      <%= render partial: "ingredients/search_result", locals: { ingredients: ingredients } %>
-    </div>
   </div>
 </div>
