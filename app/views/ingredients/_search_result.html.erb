@@ -1,3 +1,11 @@
-<% ingredients.each do |ingredient| %>
-  <p><%= ingredient.name %></p>
-<% end %>
+<span class="flex flex-wrap rounded-md border bg-white shadow-sm">
+  <% ingredients.each do |ingredient| %>
+    <% ingredient_ids = params[:ingredient_ids].to_a.dup.append(ingredient.id) %>
+
+    <button
+      class="border-e px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:relative"
+    >
+    <%= link_to("#{ingredient.name} (#{ingredient[:recipe_count]})", recipes_path(ingredient_ids: ingredient_ids)) %>
+    </button>
+  <% end %>
+</span>
