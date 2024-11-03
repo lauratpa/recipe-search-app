@@ -41,6 +41,7 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.uncountable "masa harina"
   inflect.uncountable "mayonnaise"
   inflect.uncountable "meal"
+  inflect.uncountable "meat"
   inflect.uncountable "milk"
   inflect.uncountable "mix"
   inflect.uncountable "mustard"
@@ -52,6 +53,7 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.uncountable "pepper"
   inflect.uncountable "powder"
   inflect.uncountable "puree"
+  inflect.uncountable "relish"
   inflect.uncountable "rosemary"
   inflect.uncountable "sage"
   inflect.uncountable "salt"
@@ -70,6 +72,7 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.uncountable "sweetener"
   inflect.uncountable "tartar"
   inflect.uncountable "thyme"
+  inflect.uncountable "tofu"
   inflect.uncountable "turkey"
   inflect.uncountable "ube"
   inflect.uncountable "vinegar"
@@ -85,6 +88,7 @@ class TagExtractor
     "cut into",
     "to taste",
     "as needed",
+    "as desired",
     "if needed",
     "chilled in freezer",
     "for brushing",
@@ -97,6 +101,11 @@ class TagExtractor
     "for rolling",
     "for work surfaces",
     "for greasing",
+    "for decorations",
+    "for baking",
+    "for decorating",
+    "for coating",
+    "for cooking",
     "to spray tops of loaves",
     "room temperature",
     "broken into",
@@ -111,7 +120,8 @@ class TagExtractor
     "more",
     "of",
     "or",
-    "to"
+    "to",
+    "very"
   ]
 
   ADJECTIVES = [
@@ -140,6 +150,7 @@ class TagExtractor
     "finely",
     "firmly",
     "freshly",
+    "fully",
     "lightly",
     "roughly",
     "slightly",
@@ -157,6 +168,7 @@ class TagExtractor
   ]
 
   MEASUREMENTS = [
+    "bite sizes",
     "bottles",
     "cans",
     "chunks",
@@ -164,6 +176,7 @@ class TagExtractor
     "cubes",
     "cups",
     "degrees",
+    "drops",
     "envelopes",
     "florets",
     "gallons",
@@ -171,6 +184,7 @@ class TagExtractor
     "jars",
     "ounces",
     "packages",
+    "packets",
     "pieces",
     "pints",
     "portions",
@@ -180,6 +194,7 @@ class TagExtractor
     "sheets",
     "slices",
     "spoons",
+    "strips",
     "tablespoons",
     "teaspoons",
     "wedges"
@@ -215,6 +230,7 @@ class TagExtractor
     "refrigerated",
     "removed",
     "liquid reserved",
+    "loosely",
     "scalded",
     "seeded",
     "separated",
@@ -227,6 +243,8 @@ class TagExtractor
     "toasted",
     "torn",
     "thawed",
+    "tightly",
+    "trimmed",
     "warmed",
     "whisked",
     "zested"
