@@ -1,7 +1,7 @@
 class RecipesController < ApplicationController
   def index
-    recipes = Recipe.by_ingredient_and_rating(filter.or).limit(10)
-    recipes = Recipe.order("rating desc").limit(10) if filter.none?
+    recipes = Recipe.by_ingredient_and_rating(filter.or).limit(10).includes(:ingredients)
+    recipes = Recipe.order("rating desc").limit(10).includes(:ingredients) if filter.none?
 
     ingredients = Ingredient.order_by_recipe_count.limit(50)
 
