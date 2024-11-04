@@ -4,8 +4,8 @@ class RecipeFilter
   attr_reader :or, :and
 
   def initialize(params)
-    @or = params.fetch(:ingredient_ids, {}).fetch(:or, [])
-    @and = params.fetch(:ingredient_ids, {}).fetch(:and, [])
+    @or = params.fetch(:ingredient_ids, {}).fetch(:or, []).reject(&:blank?)
+    @and = params.fetch(:ingredient_ids, {}).fetch(:and, []).reject(&:blank?)
   end
 
   def new_with(or_id: nil, and_id: nil)
@@ -30,13 +30,19 @@ class RecipeFilter
     @or.include?(ingredient_id.to_s)
   end
 
+  def and_include?(ingredient_id)
+    @and.include?(ingredient_id.to_s)
+  end
+
   def add_to_or(ingredient_id)
+    return if ingredient_id.blank?
     raise ContradictionError if @and.include?(ingredient_id)
 
     @or << ingredient_id
   end
 
   def add_to_and(ingredient_id)
+    return if ingredient_id.blank?
     raise ContradictionError if @or.include?(ingredient_id)
 
     @and << ingredient_id

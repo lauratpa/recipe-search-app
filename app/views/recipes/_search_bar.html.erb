@@ -7,7 +7,15 @@
         <%= Ingredient.find(ingredient_id).name %>
         <%= link_to "x", recipes_path(new_filter.to_params), class: 'border rounded-md px-1 py-1 bg-red-200' %>
       </div>
-      <span class="content-center mt-2"><%= "or" if ingredient_id != filter.or.last %></span>
+    <% end %>
+
+    <% filter.and.each do |ingredient_id| %>
+      <% new_filter = filter.new_without(and_id: ingredient_id) %>
+
+      <div class="text-xs border rounded-md mx-2 pl-2 py-1 bg-lime-600 mt-2">
+        <%= Ingredient.find(ingredient_id).name %>
+        <%= link_to "x", recipes_path(new_filter.to_params), class: 'border rounded-md px-1 py-1 bg-red-200' %>
+      </div>
     <% end %>
   </div>
 
@@ -35,7 +43,36 @@
       </div>
 
       <div data-search-target="results" class="mt-2">
-        <%= render partial: "ingredients/search_result", locals: { ingredients: ingredients, filter: filter } %>
+        <%= render partial: "ingredients/search_result", locals: { ingredients: ingredients, filter: filter, operator: :or_id } %>
+      </div>
+    </div>
+  </div>
+
+  <div x-data="{ andSearchIsOpen: false }" class="mx-4 my-2">
+    <button x-cloak x-show="!andSearchIsOpen" @click="andSearchIsOpen = true" type="button" class="items-center justify-center border rounded-md p-0.5 my-2 text-gray-900">
+      <span>Add a required ingredient</span>
+    </button>
+
+    <!-- Maybe search -->
+    <div x-cloak x-show="andSearchIsOpen" x-transition id="maybe-search" data-controller="search">
+      <div class="flex flex-row space-x-2">
+        <span class="p-0.5">Add a required ingredient:</span>
+
+        <div>
+          <%= form_with url: search_ingredients_path(filter.to_params), method: :post, data: { search_target: "form" }, class: "" do |form| %>
+            <div>
+              <%= form.text_field :search, data: { action: "search#search" }, autocomplete: "off", class: 'text-base p-0.5' %>
+            </div>
+          <% end %>
+        </div>
+
+        <button @click="andSearchIsOpen = false" type="button" class="items-center border rounded-md px-2 p-0.5 text-gray-900">
+          <span x-cloak x-show="andSearchIsOpen" class="text-base">X</span>
+        </button>
+      </div>
+
+      <div data-search-target="results" class="mt-2">
+        <%= render partial: "ingredients/search_result", locals: { ingredients: ingredients, filter: filter, operator: :and_id } %>
       </div>
     </div>
   </div>

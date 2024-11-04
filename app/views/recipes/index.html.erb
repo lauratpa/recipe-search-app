@@ -33,7 +33,10 @@
 
           <div class="flex flex-row flex-wrap mt-2 text-gray-700">
             <% recipe.ingredients.each do |ingredient| %>
-              <div class="text-xs border rounded-md px-2 py-1 <%= filter.or_include?(ingredient.id) ? 'bg-lime-300' : '' %>">
+              <% highlight_color = "bg-lime-300" if filter.or_include?(ingredient.id) %>
+              <% highlight_color = "bg-lime-600" if filter.and_include?(ingredient.id) %>
+
+              <div class="text-xs border rounded-md px-2 py-1 <%= highlight_color.to_s %>">
                 <%= ingredient.name %>
               </div>
             <% end %>

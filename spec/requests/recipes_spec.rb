@@ -129,13 +129,18 @@ RSpec.describe 'Recipes', type: :request do
 
         bananas_and_oranges_recipe = create(:recipe, title: 'Bananas and oranges recipe', category: category)
           .tap { |recipe| recipe.ingredients << [ bananas, oranges ] }
+        bananas_oranges_and_kiwis_recipe = create(:recipe, title: 'Bananas, oranges and kiwis recipe', category: category)
+          .tap { |recipe| recipe.ingredients << [ bananas, oranges, kiwis ] }
+        bananas_oranges_and_apples_recipe = create(:recipe, title: 'Bananas, oranges and apples recipe', category: category)
+          .tap { |recipe| recipe.ingredients << [ bananas, oranges, apples ] }
+        bananas_and_kiwis_recipe = create(:recipe, title: 'Bananas and kiwis recipe', category: category)
+          .tap { |recipe| recipe.ingredients << [ bananas, kiwis ] }
         oranges_recipe = create(:recipe, title: 'Oranges recipe', category: category)
           .tap { |recipe| recipe.ingredients << oranges }
         apples_recipe = create(:recipe, title: 'Apples recipe', category: category)
           .tap { |recipe| recipe.ingredients << apples }
         kiwis_recipe = create(:recipe, title: 'Kiwis recipe', category: category)
           .tap { |recipe| recipe.ingredients << kiwis }
-
 
         params = {
           ingredient_ids: {
@@ -149,10 +154,19 @@ RSpec.describe 'Recipes', type: :request do
         expect(response).to have_http_status(200)
 
         # Page contains recipes for the selected ingredients
-        expect(response.body).to include(bananas_and_oranges_recipe.title, kiwis_recipe.title)
+        expect(response.body).to include(
+          bananas_oranges_and_kiwis_recipe.title,
+          bananas_oranges_and_apples_recipe.title,
+          bananas_and_oranges_recipe.title,
+        )
         # Page does not contain recipes missing the ingredients
-        expect(response.body).not_to include(apples_recipe.title, oranges_recipe.title)
-        expect(response.body).to include("Found 2 recipes")
+        expect(response.body).not_to include(
+          bananas_and_kiwis_recipe.title,
+          kiwis_recipe.title,
+          apples_recipe.title,
+          oranges_recipe.title
+        )
+        expect(response.body).to include("Found 3 recipes")
       end
     end
   end

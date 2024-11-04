@@ -2,18 +2,19 @@ class RecipesController < ApplicationController
   def index
     recipes = Recipe.order("rating desc")
 
-    or_recipes = recipes.any_ingredient_by_rating(filter.or) if filter.or.any?
-    and_recipes = recipes.all_ingredients_by_rating(filter.and) if filter.and.any?
-
-    recipes = or_recipes.or(and_recipes) if or_recipes && and_recipes
-    recipes = and_recipes if and_recipes && !or_recipes
-    recipes = or_recipes if or_recipes && !and_recipes
+    recipes = Recipe.any_ingredient_by_rating(filter.or) if filter.or.any? && filter.and.none?
+    recipes = Recipe.all_ingredients_by_rating(filter.and) if filter.and.any? && filter.or.none?
+    recipes = Recipe.all_and_any_ingredients_by_rating(filter.and, filter.or) if filter.and.any? && filter.or.any?
 
     total_recipes_count = Recipe.from(recipes).count
 
     recipes = recipes.limit(limit).offset(offset).includes(:ingredients)
 
-    ingredients = Ingredient.order_by_recipe_count.limit(50)
+    ingredients = Ingredient
+      .where.not(id: filter.and)
+      .where.not(id: filter.or)
+      .order_by_recipe_count
+      .limit(50)
 
     render(
       :index,
