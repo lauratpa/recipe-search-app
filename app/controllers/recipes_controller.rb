@@ -30,7 +30,7 @@ class RecipesController < ApplicationController
   end
 
   def show
-    recipe = Recipe.includes(:ingredients).find(params[:id])
+    recipe = Recipe.find(params[:id])
 
     render :show, locals: { recipe: recipe }
   end
