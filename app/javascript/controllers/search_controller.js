@@ -19,4 +19,3 @@ export default class extends Controller {
     .then(data => this.resultsTarget.innerHTML = data) 
   }
 }
-  

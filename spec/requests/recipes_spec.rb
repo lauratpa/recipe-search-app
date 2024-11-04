@@ -18,6 +18,49 @@ RSpec.describe 'Recipes', type: :request do
           .to include("3.2", "3.4", "3.6", "3.8", "4.0", "4.2", "4.4", "4.6", "4.8", "5.0")
         # Page does not contain the lowest ranked recipe
         expect(response.body).not_to include("3.0")
+        expect(response.body).to include("Found 11 recipes")
+      end
+    end
+
+    context 'when using limit parameter' do
+      it 'shows the specified number of recipes' do
+        category = create(:category)
+
+        (3.0..5.0).step(1).each do |rating|
+          recipe = create(:recipe, category: category, rating: rating)
+        end
+
+        get recipes_path, params: { limit: 2 }
+
+        expect(response).to have_http_status(200)
+
+        # Page contains 10 highest ranked recipes
+        expect(response.body)
+          .to include("5.0", "4.0")
+        # Page does not contain the lowest ranked recipe
+        expect(response.body).not_to include("3.0")
+        expect(response.body).to include("Found 3 recipes")
+      end
+    end
+
+    context 'when using offset paramaeter' do
+      it 'skips the specified number of recipes' do
+        category = create(:category)
+
+        (3.0..5.0).step(1).each do |rating|
+          recipe = create(:recipe, category: category, rating: rating)
+        end
+
+        get recipes_path, params: { limit: 2, page: 2 }
+
+        expect(response).to have_http_status(200)
+
+        # Page contains 10 highest ranked recipes
+        expect(response.body)
+          .to include("3.0")
+        # Page does not contain the lowest ranked recipe
+        expect(response.body).not_to include("5.0", "4.0")
+        expect(response.body).to include("Found 3 recipes")
       end
     end
 
@@ -44,6 +87,7 @@ RSpec.describe 'Recipes', type: :request do
         expect(response.body).to include(bananas_recipe.title, oranges_recipe.title)
         # Page does not contain recipes missing the ingredients
         expect(response.body).not_to include(apples_recipe.title)
+        expect(response.body).to include("Found 2 recipes")
       end
     end
 
@@ -70,6 +114,7 @@ RSpec.describe 'Recipes', type: :request do
         expect(response.body).to include(bananas_and_oranges_recipe.title)
         # Page does not contain recipes missing the ingredients
         expect(response.body).not_to include(apples_recipe.title, oranges_recipe.title)
+        expect(response.body).to include("Found 1 recipe")
       end
     end
 
@@ -107,6 +152,7 @@ RSpec.describe 'Recipes', type: :request do
         expect(response.body).to include(bananas_and_oranges_recipe.title, kiwis_recipe.title)
         # Page does not contain recipes missing the ingredients
         expect(response.body).not_to include(apples_recipe.title, oranges_recipe.title)
+        expect(response.body).to include("Found 2 recipes")
       end
     end
   end

@@ -6,29 +6,40 @@
       <h1 class="font-bold text-2xl">Recipe Search</h1>
     </div>
 
+    <div>Found <%= total_recipes_count %> <%= 'recipe'.pluralize(total_recipes_count) %></div>
+
+    <!-- pagination -->
+    <div>
+      <% prev_page = next_page - 2 %>
+      <% unless prev_page.zero? %>
+        <%= link_to('prev', recipes_path(filter.to_params.merge(limit: limit, page: prev_page))) %>
+      <% end %>
+      <%= link_to('next', recipes_path(filter.to_params.merge(limit: limit, page: next_page))) %>
+    </div>
+
     <div class="grid grid-cols-2 gap-4">
-        <% recipes.each do |recipe| %>
-          <div>
-            <h3 class="font-bold text-md text-gray-900">
-              <%= link_to "#{recipe.title} (#{recipe.rating})", recipe_path(recipe) %>
-            </h3>
+      <% recipes.each do |recipe| %>
+        <div>
+          <h3 class="font-bold text-md text-gray-900">
+            <%= link_to "#{recipe.title} (#{recipe.rating})", recipe_path(recipe) %>
+          </h3>
 
-            <a href=<%= recipe_path(recipe) %>>
-            <img
-                alt="<%= recipe.title %>"
-                src="<%= recipe.image_url %>"
-                class="w-32 h-32 object-cover"
-            ></a>
+          <a href=<%= recipe_path(recipe) %>>
+          <img
+              alt="<%= recipe.title %>"
+              src="<%= recipe.image_url %>"
+              class="w-32 h-32 object-cover"
+          ></a>
 
-            <div class="flex flex-row flex-wrap mt-2 text-gray-700">
-              <% recipe.ingredients.each do |ingredient| %>
-                <div class="text-xs border rounded-md px-2 py-1 <%= filter.or_include?(ingredient.id) ? 'bg-lime-300' : '' %>">
-                  <%= ingredient.name %>
-                </div>
-              <% end %>
-            </div>
+          <div class="flex flex-row flex-wrap mt-2 text-gray-700">
+            <% recipe.ingredients.each do |ingredient| %>
+              <div class="text-xs border rounded-md px-2 py-1 <%= filter.or_include?(ingredient.id) ? 'bg-lime-300' : '' %>">
+                <%= ingredient.name %>
+              </div>
+            <% end %>
           </div>
-        <% end %>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>
