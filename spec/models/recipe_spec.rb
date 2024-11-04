@@ -1,94 +1,133 @@
 require 'rails_helper'
 
 RSpec.describe Recipe, type: :model do
+  let(:category) { create(:category) }
+  let(:bananas) { create(:ingredient, name: 'bananas') }
+  let(:apples) { create(:ingredient, name: 'apples') }
+  let(:oranges) { create(:ingredient, name: 'oranges') }
+  let(:kiwis) { create(:ingredient, name: 'kiwis') }
+
+  def create_recipe(rating: '5.0', ingredients:)
+    create(
+      :recipe,
+      title: "#{ingredients.map(&:name).join(' ').capitalize} #{rating}",
+      category: category, rating: rating
+    ).tap { |recipe| recipe.ingredients << ingredients }
+  end
+
   describe '.with_ingredients' do
     it 'returns recipe which contain the given ingredient ids' do
-      category = create(:category)
-      bananas = create(:ingredient, name: 'bananas')
-      apples = create(:ingredient, name: 'apples')
-
-      create(:recipe, category: category).tap { |recipe| recipe.ingredients << bananas }
-      apples_recipe = create(:recipe, category: category)
-        .tap { |recipe| recipe.ingredients << apples }
+      create_recipe(ingredients: [ bananas ])
+      apples_recipe = create_recipe(ingredients: [ apples ])
 
       expect(described_class.with_ingredients([ apples.id ])).to contain_exactly(apples_recipe)
     end
   end
 
-  describe '.any_ingredient_by_rating' do
+  describe '.or_ingredients_by_rating' do
     it 'orders recipes by rating' do
-      category = create(:category)
+      worse_bananas_apples_oranges_recipe = create_recipe(
+        rating: 3.9, ingredients: [ bananas, apples, oranges ]
+      )
+      better_bananas_apples_oranges_recipe = create_recipe(
+        rating: 4.0, ingredients: [ bananas, apples, oranges ]
+      )
+      apples_oranges_recipe = create_recipe(ingredients: [ apples, oranges ])
+      oranges_recipe = create_recipe(ingredients: [ oranges ])
+      create_recipe(ingredients: [ kiwis ]) # not returned
 
-      bananas = create(:ingredient, name: 'bananas')
-      apples = create(:ingredient, name: 'apples')
-      oranges = create(:ingredient, name: 'orange')
-      kiwis = create(:ingredient, name: 'kiwis')
-
-
-      second_recipe = create(:recipe, title: 'Second', category: category, rating: 3.9)
-        .tap { |recipe| recipe.ingredients << [ bananas, apples, oranges ] }
-      first_recipe = create(:recipe, title: 'First', category: category, rating: 4.0)
-        .tap { |recipe| recipe.ingredients << [ bananas, apples, oranges ] }
-      third_recipe =create(:recipe, title: 'Third', category: category, rating: 4.1)
-        .tap { |recipe| recipe.ingredients << [ apples, oranges ] }
-      fourth_recipe = create(:recipe, title: 'Fourth', category: category, rating: 4.2)
-        .tap { |recipe| recipe.ingredients << oranges }
-      create(:recipe, title: 'Fifth', category: category, rating: 4.3)
-        .tap { |recipe| recipe.ingredients << kiwis }
-
-      expect(described_class.any_ingredient_by_rating([ bananas.id, apples.id, oranges.id ]))
-        .to eq([ first_recipe, second_recipe, third_recipe, fourth_recipe ])
+      expect(described_class.or_ingredients_by_rating([ bananas.id, apples.id, oranges.id ]))
+        .to eq(
+          [
+            better_bananas_apples_oranges_recipe,
+            worse_bananas_apples_oranges_recipe,
+            apples_oranges_recipe,
+            oranges_recipe
+          ]
+        )
     end
   end
 
-  describe '.all_ingredients_by_rating' do
+  describe '.and_ingredients_by_rating' do
     it 'orders recipes by rating' do
-      category = create(:category)
+      worse_bananas_apples_oranges_recipe = create_recipe(
+        rating: 3.9, ingredients: [ bananas, apples, oranges ]
+      )
+      better_bananas_apples_recipe = create_recipe(
+        rating: 4.0, ingredients: [ bananas, apples ]
+      )
 
-      bananas = create(:ingredient, name: 'bananas')
-      apples = create(:ingredient, name: 'apples')
-      oranges = create(:ingredient, name: 'orange')
+      create_recipe(ingredients: [ bananas, oranges ]) # missing apples
+      create_recipe(ingredients: [ oranges ]) # missing bananas and apples
 
-      second_recipe = create(:recipe, title: 'Second', category: category, rating: 3.9)
-        .tap { |recipe| recipe.ingredients << [ bananas, apples, oranges ] }
-      first_recipe = create(:recipe, title: 'First', category: category, rating: 4.0)
-        .tap { |recipe| recipe.ingredients << [ bananas, apples ] }
-
-      create(:recipe, title: 'Third', category: category, rating: 4.1)
-        .tap { |recipe| recipe.ingredients << [ bananas, oranges ] }
-      create(:recipe, title: 'Fourth', category: category, rating: 4.2)
-        .tap { |recipe| recipe.ingredients << oranges }
-
-      expect(described_class.all_ingredients_by_rating([ bananas.id, apples.id ]))
-        .to eq([ first_recipe, second_recipe ])
+      expect(described_class.and_ingredients_by_rating([ bananas.id, apples.id ]))
+        .to eq([ better_bananas_apples_recipe, worse_bananas_apples_oranges_recipe ])
     end
   end
 
-  describe '.all_and_any_ingredients_by_rating' do
+  describe '.and_or_ingredients_by_rating' do
     it 'orders recipes by rating' do
-      category = create(:category)
+      bananas_apples_oranges_recipe = create_recipe(ingredients: [ bananas, apples, oranges ])
+      bananas_apples_kiwis_recipe = create_recipe(ingredients: [ bananas, apples, kiwis ])
 
-      bananas = create(:ingredient, name: 'bananas')
-      apples = create(:ingredient, name: 'apples')
-      oranges = create(:ingredient, name: 'orange')
-      kiwis = create(:ingredient, name: 'kiwis')
+      create_recipe(ingredients: [ apples, oranges ]) # missing bananas
+      create_recipe(ingredients: [ oranges ]) # missing bananas
+      create_recipe(ingredients: [ kiwis ]) # missing bananas and apples
 
-      second_recipe = create(:recipe, title: 'Second', category: category, rating: 4.0)
-        .tap { |recipe| recipe.ingredients << [ bananas, apples, oranges ] }
-      first_recipe = create(:recipe, title: 'First', category: category, rating: 3.9)
-        .tap { |recipe| recipe.ingredients << [ bananas, apples, kiwis ] }
-
-      create(:recipe, title: 'Third', category: category, rating: 4.1)
-        .tap { |recipe| recipe.ingredients << [ apples, oranges ] }
-      create(:recipe, title: 'Fourth', category: category, rating: 4.2)
-        .tap { |recipe| recipe.ingredients << oranges }
-      create(:recipe, title: 'Fifth', category: category, rating: 4.3)
-        .tap { |recipe| recipe.ingredients << kiwis }
-
-      result = described_class.all_and_any_ingredients_by_rating([ bananas.id, apples.id ], [ kiwis.id ])
-      expect(result).to eq([ first_recipe, second_recipe ])
-      expect(result.first[:ingredient_count]).to eq(3)
+      result = described_class.and_or_ingredients_by_rating(
+        and_ingredient_ids: [ bananas.id, apples.id ],
+        or_ingredient_ids: [ kiwis.id ]
+      )
+      expect(result).to eq([ bananas_apples_kiwis_recipe, bananas_apples_oranges_recipe ])
+      expect(result.first[:ingredient_count]).to eq(3) # kiwis are included in the count
       expect(result.last[:ingredient_count]).to eq(2)
+    end
+  end
+
+  describe '.not_ingredients_by_rating' do
+    it 'orders recipes by rating' do
+      bananas_recipe = create_recipe(ingredients: [ bananas ])
+
+      create_recipe(ingredients: [ bananas, apples ]) # contains apples
+      create_recipe(ingredients: [ apples ]) # contains apples
+
+      expect(described_class.not_ingredients_by_rating([ apples.id ]))
+        .to eq([ bananas_recipe ])
+    end
+  end
+
+  describe '.not_or_ingredients_by_rating' do
+    it 'orders recipes by rating' do
+      bananas_and_oranges_recipe = create_recipe(ingredients: [ bananas, oranges ])
+
+      create_recipe(ingredients: [ bananas, apples ]) # contains apples
+
+      expect(
+        described_class.not_or_ingredients_by_rating(
+          not_ingredient_ids: [ apples.id ],
+          or_ingredient_ids: [ oranges.id ]
+        )
+      ).to eq([ bananas_and_oranges_recipe ])
+    end
+  end
+
+  describe '.and_not_or_ingredients_by_rating' do
+    it 'orders recipes by rating' do
+      worse_bananas_oranges_kiwis_recipe = create_recipe(ingredients: [ bananas, oranges ], rating: 3.9)
+      better_bananas_kiwis_recipe = create_recipe(ingredients: [ bananas, kiwis ], rating: 4.8)
+
+      create_recipe(ingredients: [ bananas, apples, oranges ]) # contains apples
+      create_recipe(ingredients: [ apples, kiwis ]) # contains apples
+      create_recipe(ingredients: [ oranges ]) # missing bananas
+
+      expect(
+        described_class.and_not_or_ingredients_by_rating(
+          and_ingredient_ids: [ bananas.id ],
+          not_ingredient_ids: [ apples.id ],
+          or_ingredient_ids: [ kiwis.id ]
+        )
+      )
+        .to eq([ better_bananas_kiwis_recipe, worse_bananas_oranges_kiwis_recipe ])
     end
   end
 end

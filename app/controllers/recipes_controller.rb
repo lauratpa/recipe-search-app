@@ -1,26 +1,19 @@
 class RecipesController < ApplicationController
   def index
-    recipes = Recipe.order("rating desc")
-
-    recipes = Recipe.any_ingredient_by_rating(filter.or) if filter.or.any? && filter.and.none?
-    recipes = Recipe.all_ingredients_by_rating(filter.and) if filter.and.any? && filter.or.none?
-    recipes = Recipe.all_and_any_ingredients_by_rating(filter.and, filter.or) if filter.and.any? && filter.or.any?
+    recipes = default_recipes
+    recipes = or_recipes if filter.only_or?
+    recipes = and_recipes if filter.only_and?
+    recipes = and_or_recipes if filter.and_or?
 
     total_recipes_count = Recipe.from(recipes).count
 
     recipes = recipes.limit(limit).offset(offset).includes(:ingredients)
 
-    ingredients = Ingredient
-      .where.not(id: filter.and)
-      .where.not(id: filter.or)
-      .order_by_recipe_count
-      .limit(50)
-
     render(
       :index,
       locals: {
         recipes: recipes,
-        ingredients: ingredients,
+        ingredients: default_ingredients,
         filter: filter,
         total_recipes_count: total_recipes_count,
         next_page: page + 1,
@@ -51,5 +44,29 @@ class RecipesController < ApplicationController
 
   def offset
     (page - 1) * limit
+  end
+
+  def default_ingredients
+    Ingredient
+      .where.not(id: filter.and)
+      .where.not(id: filter.or)
+      .order_by_recipe_count
+      .limit(50)
+  end
+
+  def default_recipes
+    Recipe.by_rating
+  end
+
+  def or_recipes
+    Recipe.or_ingredients_by_rating(filter.or)
+  end
+
+  def and_recipes
+    Recipe.and_ingredients_by_rating(filter.and)
+  end
+
+  def and_or_recipes
+    Recipe.and_or_ingredients_by_rating(and_ingredient_ids: filter.and, or_ingredient_ids: filter.or)
   end
 end

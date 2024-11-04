@@ -26,6 +26,18 @@ class RecipeFilter
     @or.empty? && @and.empty?
   end
 
+  def only_or?
+    @or.any? && @and.empty?
+  end
+
+  def only_and?
+    @and.any? && @or.empty?
+  end
+
+  def and_or?
+    @or.any? && @and.any?
+  end
+
   def or_include?(ingredient_id)
     @or.include?(ingredient_id.to_s)
   end
