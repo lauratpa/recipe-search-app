@@ -15,7 +15,7 @@ RSpec.describe Recipe, type: :model do
     end
   end
 
-  describe '.by_ingredient_and_rating' do
+  describe '.any_ingredient_by_rating' do
     it 'orders recipes by rating' do
       category = create(:category)
 
@@ -32,8 +32,30 @@ RSpec.describe Recipe, type: :model do
       fourth_recipe = create(:recipe, category: category, rating: 4.2)
         .tap { |recipe| recipe.ingredients << oranges }
 
-      expect(described_class.by_ingredient_and_rating([ bananas.id, apples.id, oranges.id ]))
+      expect(described_class.any_ingredient_by_rating([ bananas.id, apples.id, oranges.id ]))
         .to eq([ first_recipe, second_recipe, third_recipe, fourth_recipe ])
+    end
+  end
+
+  describe '.all_ingredients_by_rating' do
+    it 'orders recipes by rating' do
+      category = create(:category)
+
+      bananas = create(:ingredient, name: 'bananas')
+      apples = create(:ingredient, name: 'apples')
+      oranges = create(:ingredient, name: 'orange')
+
+      second_recipe = create(:recipe, category: category, rating: 3.9)
+        .tap { |recipe| recipe.ingredients << [ bananas, apples, oranges ] }
+      first_recipe = create(:recipe, category: category, rating: 4.0)
+        .tap { |recipe| recipe.ingredients << [ bananas, apples ] }
+      third_recipe = create(:recipe, category: category, rating: 4.1)
+        .tap { |recipe| recipe.ingredients << [ bananas, oranges ] }
+      fourth_recipe = create(:recipe, category: category, rating: 4.2)
+        .tap { |recipe| recipe.ingredients << oranges }
+
+      expect(described_class.all_ingredients_by_rating([ bananas.id, apples.id ]))
+        .to eq([ first_recipe, second_recipe ])
     end
   end
 end

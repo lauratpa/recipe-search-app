@@ -21,7 +21,7 @@ RSpec.describe 'Recipes', type: :request do
       end
     end
 
-    context 'when visiting page with selected ingredients' do
+    context 'when visiting page with selected OR ingredients' do
       it 'shows recipes that contain any of the selected ingredients' do
         category = create(:category)
 
@@ -44,6 +44,69 @@ RSpec.describe 'Recipes', type: :request do
         expect(response.body).to include(bananas_recipe.title, oranges_recipe.title)
         # Page does not contain recipes missing the ingredients
         expect(response.body).not_to include(apples_recipe.title)
+      end
+    end
+
+    context 'when visiting page with selected AND ingredients' do
+      it 'shows recipes that contain any of the selected ingredients' do
+        category = create(:category)
+
+        bananas = create(:ingredient, name: 'bananas')
+        apples = create(:ingredient, name: 'apples')
+        oranges = create(:ingredient, name: 'oranges')
+
+        bananas_and_oranges_recipe = create(:recipe, title: 'Bananas and oranges recipe', category: category)
+          .tap { |recipe| recipe.ingredients << [ bananas, oranges ] }
+        oranges_recipe = create(:recipe, title: 'Oranges recipe', category: category)
+          .tap { |recipe| recipe.ingredients << oranges }
+        apples_recipe = create(:recipe, title: 'Apples recipe', category: category)
+          .tap { |recipe| recipe.ingredients << apples }
+
+        get recipes_path, params: { ingredient_ids: {  and: [ bananas.id, oranges.id ] } }
+
+        expect(response).to have_http_status(200)
+
+        # Page contains recipes for the selected ingredients
+        expect(response.body).to include(bananas_and_oranges_recipe.title)
+        # Page does not contain recipes missing the ingredients
+        expect(response.body).not_to include(apples_recipe.title, oranges_recipe.title)
+      end
+    end
+
+    context 'when visiting page with selected AND and OR ingredients' do
+      it 'shows recipes that contain any of the selected ingredients' do
+        category = create(:category)
+
+        bananas = create(:ingredient, name: 'bananas')
+        apples = create(:ingredient, name: 'apples')
+        oranges = create(:ingredient, name: 'oranges')
+        kiwis = create(:ingredient, name: 'kiwis')
+
+        bananas_and_oranges_recipe = create(:recipe, title: 'Bananas and oranges recipe', category: category)
+          .tap { |recipe| recipe.ingredients << [ bananas, oranges ] }
+        oranges_recipe = create(:recipe, title: 'Oranges recipe', category: category)
+          .tap { |recipe| recipe.ingredients << oranges }
+        apples_recipe = create(:recipe, title: 'Apples recipe', category: category)
+          .tap { |recipe| recipe.ingredients << apples }
+        kiwis_recipe = create(:recipe, title: 'Kiwis recipe', category: category)
+          .tap { |recipe| recipe.ingredients << kiwis }
+
+
+        params = {
+          ingredient_ids: {
+            and: [ bananas.id, oranges.id ],
+            or: [ kiwis.id ]
+          }
+        }
+
+        get recipes_path, params: params
+
+        expect(response).to have_http_status(200)
+
+        # Page contains recipes for the selected ingredients
+        expect(response.body).to include(bananas_and_oranges_recipe.title, kiwis_recipe.title)
+        # Page does not contain recipes missing the ingredients
+        expect(response.body).not_to include(apples_recipe.title, oranges_recipe.title)
       end
     end
   end
