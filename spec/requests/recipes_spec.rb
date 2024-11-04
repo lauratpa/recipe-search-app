@@ -26,7 +26,6 @@ RSpec.describe 'Recipes', type: :request do
         get recipes_path
 
         expect(response).to have_http_status(200)
-
         # Page contains 10 highest ranked recipes
         expect(response.body)
           .to include("3.2", "3.4", "3.6", "3.8", "4.0", "4.2", "4.4", "4.6", "4.8", "5.0")
@@ -114,12 +113,7 @@ RSpec.describe 'Recipes', type: :request do
         apples_recipe = create_recipe(ingredients: [ apples ])
         kiwis_recipe = create_recipe(ingredients: [ kiwis ])
 
-        params = {
-          ingredient_ids: {
-            and: [ bananas.id, oranges.id ],
-            or: [ kiwis.id ]
-          }
-        }
+        params = { ingredient_ids: { and: [ bananas.id, oranges.id ], or: [ kiwis.id ] } }
 
         get recipes_path, params: params
 
@@ -139,6 +133,120 @@ RSpec.describe 'Recipes', type: :request do
           oranges_recipe.title
         )
         expect(response.body).to include("Found 3 recipes")
+      end
+    end
+
+    context 'when visiting page with selected NOT ingredients' do
+      it 'shows recipes that do not contain any of the selected ingredients' do
+        bananas_and_oranges_recipe = create_recipe(ingredients: [ bananas, oranges ])
+        bananas_and_kiwis_recipe = create_recipe(ingredients: [ bananas, kiwis ])
+        apples_recipe = create_recipe(ingredients: [ apples ])
+        kiwis_recipe = create_recipe(ingredients: [ kiwis ])
+
+        params = { ingredient_ids: { not: [ kiwis.id ] } }
+
+        get recipes_path, params: params
+
+        expect(response).to have_http_status(200)
+
+        # Page contains recipes that do not contain the selected ingredients
+        expect(response.body).to include(
+          bananas_and_oranges_recipe.title,
+          apples_recipe.title,
+        )
+        # Page does not contain recipes that contain the selected ingredients
+        expect(response.body).not_to include(
+          bananas_and_kiwis_recipe.title,
+          kiwis_recipe.title
+        )
+        expect(response.body).to include("Found 2 recipes")
+      end
+    end
+
+    context 'when visiting page with selected NOT and OR ingredients' do
+      it 'shows recipes that do not contain any of the NOT ingredients but contains OR ingredients' do
+        bananas_and_oranges_recipe = create_recipe(ingredients: [ bananas, oranges ])
+        oranges_and_kiwis_recipe = create_recipe(ingredients: [ oranges, kiwis ])
+        apples_recipe = create_recipe(ingredients: [ apples ])
+        kiwis_recipe = create_recipe(ingredients: [ kiwis ])
+
+        params = { ingredient_ids: { not: [ kiwis.id ], or: [ oranges.id ] } }
+
+        get recipes_path, params: params
+
+        expect(response).to have_http_status(200)
+
+        # Page contains recipes that do not contain the NOT ingredients
+        # but contain the OR ingredients
+        expect(response.body).to include(
+          bananas_and_oranges_recipe.title,
+        )
+        # Page does not contain recipes that contain the NOT ingredients
+        # nor recipes with no OR ingredients
+        expect(response.body).not_to include(
+          oranges_and_kiwis_recipe.title,
+          apples_recipe.title,
+          kiwis_recipe.title
+        )
+        expect(response.body).to include("Found 1 recipe")
+      end
+    end
+
+    context 'when visiting page with selected NOT and AND ingredients' do
+      it 'shows recipes that do not contain any of the NOT ingredients but contains AND ingredients' do
+        bananas_and_oranges_recipe = create_recipe(ingredients: [ bananas, oranges ])
+        oranges_and_kiwis_recipe = create_recipe(ingredients: [ oranges, kiwis ])
+        apples_recipe = create_recipe(ingredients: [ apples ])
+        kiwis_recipe = create_recipe(ingredients: [ kiwis ])
+
+        params = { ingredient_ids: { not: [ kiwis.id ], and: [ oranges.id ] } }
+
+        get recipes_path, params: params
+
+        expect(response).to have_http_status(200)
+
+        # Page contains recipes that do not contain the NOT ingredients
+        # but contain the OR ingredients
+        expect(response.body).to include(
+          bananas_and_oranges_recipe.title,
+        )
+        # Page does not contain recipes that contain the NOT ingredients
+        # nor recipes with no OR ingredients
+        expect(response.body).not_to include(
+          oranges_and_kiwis_recipe.title,
+          apples_recipe.title,
+          kiwis_recipe.title
+        )
+        expect(response.body).to include("Found 1 recipe")
+      end
+    end
+
+    context 'when visiting page with selected NOT, AND and OR ingredients' do
+      it 'shows recipes that do not contain any of the selected ingredients' do
+        oranges_and_apples_recipe = create_recipe(ingredients: [ oranges, apples ])
+        oranges_bananas_and_kiwis_recipe = create_recipe(ingredients: [ oranges, bananas, kiwis ])
+        oranges_bananas_and_apples_recipe = create_recipe(ingredients: [ oranges, apples, bananas ])
+        apples_recipe = create_recipe(ingredients: [ apples ])
+        kiwis_recipe = create_recipe(ingredients: [ kiwis ])
+
+        params = { ingredient_ids: { not: [ kiwis.id ], and: [ oranges.id ], or: [ bananas.id ] } }
+
+        get recipes_path, params: params
+
+        expect(response).to have_http_status(200)
+
+        # Page contains recipes that do not contain the selected ingredients
+        expect(response.body).to include(
+          oranges_and_apples_recipe.title,
+          oranges_bananas_and_apples_recipe.title
+        )
+        # Page does not contain recipes that contain the selected ingredients
+        expect(response.body).not_to include(
+          oranges_bananas_and_kiwis_recipe.title,
+          apples_recipe.title,
+          kiwis_recipe.title
+        )
+        expect(response.body).to include("Found 2 recipes")
       end
     end
   end

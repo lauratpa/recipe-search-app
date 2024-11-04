@@ -49,6 +49,20 @@ class Recipe < ApplicationRecord
       .order("ingredient_count desc, rating desc")
   end
 
+  def self.and_not_ingredients_by_rating(and_ingredient_ids:, not_ingredient_ids:)
+    sub_select = select("id")
+      .with_ingredients(not_ingredient_ids)
+      .group("recipes.id")
+      .having("count(ingredient_id) > 0")
+
+    select("recipes.*, count(ingredient_id) as ingredient_count")
+      .with_ingredients(and_ingredient_ids)
+      .where.not("recipes.id IN (#{sub_select.to_sql})")
+      .group("recipes.id")
+      .having("count(ingredient_id) = ?", and_ingredient_ids.size)
+      .by_rating
+  end
+
   # Returns recipes with all matching ingredients but optional ingredients are included
   # in the match count
   def self.and_or_ingredients_by_rating(and_ingredient_ids:, or_ingredient_ids:)

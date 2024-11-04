@@ -4,6 +4,7 @@ class IngredientsController < ApplicationController
       .search_by_name(params[:search])
       .where.not(id: filter.and)
       .where.not(id: filter.or)
+      .where.not(id: filter.not)
       .order_by_recipe_count
       .limit(50)
 

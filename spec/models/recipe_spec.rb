@@ -111,6 +111,22 @@ RSpec.describe Recipe, type: :model do
     end
   end
 
+  describe '.and_not_ingredients_by_rating' do
+    it 'orders recipes by rating' do
+      bananas_and_oranges_recipe = create_recipe(ingredients: [ bananas, oranges ])
+
+      create_recipe(ingredients: [ bananas, apples ]) # contains apples
+      create_recipe(ingredients: [ apples ]) # contains apples
+
+      expect(
+        described_class.and_not_ingredients_by_rating(
+          and_ingredient_ids: [ bananas.id ],
+          not_ingredient_ids: [ apples.id ]
+        )
+      ).to eq([ bananas_and_oranges_recipe ])
+    end
+  end
+
   describe '.and_not_or_ingredients_by_rating' do
     it 'orders recipes by rating' do
       worse_bananas_oranges_kiwis_recipe = create_recipe(ingredients: [ bananas, oranges ], rating: 3.9)
