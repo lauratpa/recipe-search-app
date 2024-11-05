@@ -60,6 +60,7 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.uncountable "rosemary"
   inflect.uncountable "sage"
   inflect.uncountable "salt"
+  inflect.uncountable "salsa"
   inflect.uncountable "sauce"
   inflect.uncountable "seasoning"
   inflect.uncountable "shortening"
@@ -69,6 +70,7 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.uncountable "spread"
   inflect.uncountable "squash"
   inflect.uncountable "starter"
+  inflect.uncountable "stock"
   inflect.uncountable "substitute"
   inflect.uncountable "sugar"
   inflect.uncountable "syrup"
@@ -110,10 +112,12 @@ class TagExtractor
     "for decorating",
     "for coating",
     "for cooking",
-    "to spray tops of loaves",
+    "for steaming",
+    "Water to spray tops of loaves",
     "room temperature",
     "broken into",
-    "cut in half"
+    "cut in half",
+    "soaked in water"
   ]
 
   STOP_WORDS = [
@@ -121,6 +125,7 @@ class TagExtractor
     "at",
     "each",
     "every",
+    "for",
     "more",
     "of",
     "or",
@@ -132,6 +137,8 @@ class TagExtractor
     "cold",
     "fresh",
     "frozen",
+    "fluid",
+    "hot",
     "medium",
     "large",
     "lean",
@@ -140,6 +147,7 @@ class TagExtractor
     "packed",
     "pre",
     "pure",
+    "quartered",
     "ripe",
     "sharp",
     "small",
@@ -155,6 +163,7 @@ class TagExtractor
     "firmly",
     "freshly",
     "fully",
+    "into",
     "lightly",
     "roughly",
     "slightly",
@@ -174,10 +183,12 @@ class TagExtractor
   ]
 
   MEASUREMENTS = [
+    "bags",
     "bite sizes",
     "bottles",
     "cans",
     "chunks",
+    "cloves",
     "containers",
     "cubes",
     "cups",
@@ -187,7 +198,9 @@ class TagExtractor
     "florets",
     "gallons",
     "grams",
+    "heads",
     "jars",
+    "minutes",
     "ounces",
     "packages",
     "packets",
@@ -213,6 +226,7 @@ class TagExtractor
     "chilled",
     "cooled",
     "cored",
+    "cover",
     "chopped",
     "cleaned",
     "cooked",
@@ -233,6 +247,7 @@ class TagExtractor
     "minced",
     "peeled",
     "pitted",
+    "pressed",
     "refrigerated",
     "removed",
     "liquid reserved",
@@ -245,7 +260,9 @@ class TagExtractor
     "sliced",
     "slivered",
     "softened",
+    "split",
     "stewed",
+    "smashed",
     "toasted",
     "torn",
     "thawed",
@@ -348,7 +365,7 @@ class TagExtractor
   end
 
   def difficult_match
-    cream_of_tatar || cream_soup || extra_virgin_olive_oil
+    cream_of_tatar || cream_soup || extra_virgin_olive_oil || water
   end
 
   def cream_of_tatar
@@ -364,5 +381,13 @@ class TagExtractor
   def extra_virgin_olive_oil
     match = line.match(/\bextra(\s|-)virgin olive oil\b/)
     match[0] if match
+  end
+
+  def water
+    return false if /\bin water\b/.match?(line)
+    return false if /\bsparkling water\b/.match?(line)
+
+    match = line.match(/\bwater\b/)
+    "" if match
   end
 end

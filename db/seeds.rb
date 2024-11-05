@@ -36,10 +36,12 @@ data.each do |recipe_hsh|
 
     recipe_ingredients = recipe_hsh.fetch("ingredients").map do |ingredient_str|
       ingredient_tag = TagExtractor.call(ingredient_str)
+      next if ingredient_tag.blank?
+
       ingredient = Ingredient.find_or_create_by(name: ingredient_tag)
 
       {ingredient_id: ingredient.id, recipe_id: recipe.id}
-    end
+    end.compact
 
     RecipeIngredient.upsert_all(recipe_ingredients, unique_by: %i[ingredient_id recipe_id])
   end

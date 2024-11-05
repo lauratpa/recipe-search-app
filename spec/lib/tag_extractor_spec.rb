@@ -40,7 +40,7 @@ RSpec.describe TagExtractor do
   end
 
   it "removes adjectives", :aggregate_failures do
-    expect(TagExtractor.call("1 cup warm water")).to eq("water")
+    expect(TagExtractor.call("1 cup warm water")).to eq("")
     expect(TagExtractor.call("1 cup fresh blueberries")).to eq("blueberries")
     expect(TagExtractor.call("¼ cup pure maple syrup")).to eq("maple syrup")
   end
@@ -72,7 +72,7 @@ RSpec.describe TagExtractor do
     expect(TagExtractor.call("¼ cup vegetable oil, or as needed")).to eq("vegetable oil")
     expect(TagExtractor.call("7 tablespoons unsalted butter, chilled in freezer and cut into thin slices")).to eq("unsalted butter")
     expect(TagExtractor.call("2 tablespoons buttermilk for brushing")).to eq("buttermilk")
-    expect(TagExtractor.call("Water to spray tops of loaves")).to eq("water")
+    expect(TagExtractor.call("Water to spray tops of loaves")).to eq("")
     expect(TagExtractor.call("1 (16.3 ounce) package refrigerated buttermilk biscuit dough, separated and each portion cut into quarters")).to eq("buttermilk biscuit dough")
     expect(TagExtractor.call("1 ½ cups buttermilk, at room temperature")).to eq("buttermilk")
     expect(TagExtractor.call("3 1/4-inch-thick slices peeled fresh ginger")).to eq("ginger")
@@ -100,5 +100,18 @@ RSpec.describe TagExtractor do
     expect(TagExtractor.call("⅓ cup toasted slivered almonds")).to eq("almonds")
     expect(TagExtractor.call("2 cups finely ground almond flour")).to eq("almond flour")
     expect(TagExtractor.call("½ teaspoon almond extract")).to eq("almond extract")
+  end
+
+  it "can separate between different waters" do
+    expect(TagExtractor.call("1 cup water")).to eq("")
+    expect(TagExtractor.call("1 large watermelon, sliced into wedges")).to eq("watermelon")
+    expect(TagExtractor.call("¾ cup warm water - 100 to 110 degrees F (40 to 45 degrees C)")).to eq("")
+    expect(TagExtractor.call("5 pounds watermelon, cut into bite-size cubes")).to eq("watermelon")
+    expect(TagExtractor.call("water to cover")).to eq("")
+    expect(TagExtractor.call("½ cup warm water (110 degrees F (43 degrees C))")).to eq("")
+    expect(TagExtractor.call("32 fluid ounces water")).to eq("")
+    expect(TagExtractor.call("1 (14 ounce) can quartered artichoke hearts in water, drained")).to eq("artichoke hearts in water")
+    expect(TagExtractor.call("bamboo skewers, soaked in water for 30 minutes")).to eq("bamboo skewers")
+    expect(TagExtractor.call("1 (1.5 fluid ounce) jigger sparkling water, or as needed")).to eq("jigger sparkling water")
   end
 end
