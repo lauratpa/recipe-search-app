@@ -43,11 +43,6 @@ class RecipesController < ApplicationController
   end
 
   def default_ingredients
-    Ingredient
-      .where.not(id: filter.and)
-      .where.not(id: filter.or)
-      .where.not(id: filter.not)
-      .order_by_recipe_count
-      .limit(50)
+    Ingredient.filtered(filter).order_by_recipe_count.limit(50)
   end
 end

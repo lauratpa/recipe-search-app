@@ -9,4 +9,7 @@ class Ingredient < ApplicationRecord
       .group("ingredients.id")
       .order("recipe_count desc")
   }
+  scope :filtered, ->(filter) {
+    where.not(id: filter.and).where.not(id: filter.or).where.not(id: filter.not)
+  }
 end

@@ -2,9 +2,7 @@ class IngredientsController < ApplicationController
   def search
     ingredients = Ingredient
       .search_by_name(params[:search])
-      .where.not(id: filter.and)
-      .where.not(id: filter.or)
-      .where.not(id: filter.not)
+      .filtered(filter)
       .order_by_recipe_count
       .limit(50)
 
