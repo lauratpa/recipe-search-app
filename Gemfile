@@ -47,6 +47,7 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  gem "dockerfile-rails", ">= 1.6"
 end
 
 group :test do
@@ -55,6 +56,5 @@ group :test do
   gem "factory_bot_rails"
   gem "faker"
   gem "selenium-webdriver"
+  gem "simplecov", require: false
 end
-
-gem "dockerfile-rails", ">= 1.6", group: :development
