@@ -17,6 +17,15 @@
         <%= link_to "x", recipes_path(new_filter.to_params), class: 'border rounded-md px-1 py-1 bg-red-200' %>
       </div>
     <% end %>
+
+    <% filter.not.each do |ingredient_id| %>
+      <% new_filter = filter.new_without(not_id: ingredient_id) %>
+
+      <div class="text-xs border rounded-md mx-2 pl-2 py-1 bg-red-600 mt-2">
+        <%= Ingredient.find(ingredient_id).name %>
+        <%= link_to "x", recipes_path(new_filter.to_params), class: 'border rounded-md px-1 py-1 bg-red-200' %>
+      </div>
+    <% end %>
   </div>
 
   <div x-data="{ maybeSearchIsOpen: false }" class="mx-4 my-2">
@@ -24,13 +33,13 @@
       <span>Add an optional ingredient</span>
     </button>
 
-    <!-- Maybe search -->
+    <!-- Or search -->
     <div x-cloak x-show="maybeSearchIsOpen" x-transition id="maybe-search" data-controller="search">
       <div class="flex flex-row space-x-2">
         <span class="p-0.5">Add an optional ingredient:</span>
 
         <div>
-          <%= form_with url: search_ingredients_path(filter.to_params), method: :post, data: { search_target: "form" }, class: "" do |form| %>
+          <%= form_with url: search_ingredients_path(filter.to_params, operator: :or_id), method: :post, data: { search_target: "form" }, class: "" do |form| %>
             <div>
               <%= form.text_field :search, data: { action: "search#search" }, autocomplete: "off", class: 'text-base p-0.5' %>
             </div>
@@ -53,13 +62,13 @@
       <span>Add a required ingredient</span>
     </button>
 
-    <!-- Maybe search -->
+    <!-- And search -->
     <div x-cloak x-show="andSearchIsOpen" x-transition id="maybe-search" data-controller="search">
       <div class="flex flex-row space-x-2">
         <span class="p-0.5">Add a required ingredient:</span>
 
         <div>
-          <%= form_with url: search_ingredients_path(filter.to_params), method: :post, data: { search_target: "form" }, class: "" do |form| %>
+          <%= form_with url: search_ingredients_path(filter.to_params, operator: :and_id), method: :post, data: { search_target: "form" }, class: "" do |form| %>
             <div>
               <%= form.text_field :search, data: { action: "search#search" }, autocomplete: "off", class: 'text-base p-0.5' %>
             </div>
@@ -73,6 +82,35 @@
 
       <div data-search-target="results" class="mt-2">
         <%= render partial: "ingredients/search_result", locals: { ingredients: ingredients, filter: filter, operator: :and_id } %>
+      </div>
+    </div>
+  </div>
+
+  <div x-data="{ notSearchIsOpen: false }" class="mx-4 my-2">
+    <button x-cloak x-show="!notSearchIsOpen" @click="notSearchIsOpen = true" type="button" class="items-center justify-center border rounded-md p-0.5 my-2 text-gray-900">
+      <span>Add an excluded ingredient</span>
+    </button>
+
+    <!-- Not search -->
+    <div x-cloak x-show="notSearchIsOpen" x-transition id="maybe-search" data-controller="search">
+      <div class="flex flex-row space-x-2">
+        <span class="p-0.5">Add an excluded ingredient:</span>
+
+        <div>
+          <%= form_with url: search_ingredients_path(filter.to_params, operator: :not_id), method: :post, data: { search_target: "form" }, class: "" do |form| %>
+            <div>
+              <%= form.text_field :search, data: { action: "search#search" }, autocomplete: "off", class: 'text-base p-0.5' %>
+            </div>
+          <% end %>
+        </div>
+
+        <button @click="notSearchIsOpen = false" type="button" class="items-center border rounded-md px-2 p-0.5 text-gray-900">
+          <span x-cloak x-show="notSearchIsOpen" class="text-base">X</span>
+        </button>
+      </div>
+
+      <div data-search-target="results" class="mt-2">
+        <%= render partial: "ingredients/search_result", locals: { ingredients: ingredients, filter: filter, operator: :not_id } %>
       </div>
     </div>
   </div>

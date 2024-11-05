@@ -11,7 +11,7 @@ class IngredientsController < ApplicationController
     render(
       partial: "ingredients/search_result",
       layout: false,
-      locals: { ingredients: ingredients, filter: filter, operator: :or_id }
+      locals: { ingredients: ingredients, filter: filter, operator: params.fetch(:operator) }
     )
   end
 

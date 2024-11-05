@@ -13,7 +13,7 @@ RSpec.describe 'Ingredients', type: :request do
       apples_recipe = create(:recipe, title: 'Apples recipe', category: category)
         .tap { |recipe| recipe.ingredients << apples }
 
-      post search_ingredients_path, params: { search: "banana" }
+      post search_ingredients_path, params: { search: "banana", operator: :or_id }
 
       expect(response).to have_http_status(200)
       expect(response.body).to include("bananas (1)")
@@ -34,7 +34,8 @@ RSpec.describe 'Ingredients', type: :request do
         search_ingredients_path,
         params: {
           search: "butter",
-          ingredient_ids: { and: [ peanut_butter.id ], or: [ buttermilk.id ] }
+          ingredient_ids: { and: [ peanut_butter.id ], or: [ buttermilk.id ] },
+          operator: 'or_id'
         }
       )
 
