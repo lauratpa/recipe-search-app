@@ -127,8 +127,9 @@ GEM
     irb (1.14.1)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    json (2.7.5)
+    json (2.7.6)
     language_server-protocol (3.17.0.3)
+    lint_roller (1.1.0)
     logger (1.6.1)
     loofah (2.23.1)
       crass (~> 1.0.2)
@@ -245,7 +246,7 @@ GEM
       rspec-mocks (~> 3.13)
       rspec-support (~> 3.13)
     rspec-support (3.13.1)
-    rubocop (1.68.0)
+    rubocop (1.66.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
@@ -255,24 +256,16 @@ GEM
       rubocop-ast (>= 1.32.2, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.33.0)
+    rubocop-ast (1.34.0)
       parser (>= 3.3.1.0)
-    rubocop-minitest (0.36.0)
-      rubocop (>= 1.61, < 2.0)
-      rubocop-ast (>= 1.31.1, < 2.0)
     rubocop-performance (1.22.1)
       rubocop (>= 1.48.1, < 2.0)
       rubocop-ast (>= 1.31.1, < 2.0)
-    rubocop-rails (2.27.0)
+    rubocop-rails (2.26.2)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.52.0, < 2.0)
       rubocop-ast (>= 1.31.1, < 2.0)
-    rubocop-rails-omakase (1.0.0)
-      rubocop
-      rubocop-minitest
-      rubocop-performance
-      rubocop-rails
     ruby-progressbar (1.13.0)
     rubyzip (2.3.2)
     securerandom (0.3.1)
@@ -295,6 +288,21 @@ GEM
       actionpack (>= 6.1)
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
+    standard (1.41.1)
+      language_server-protocol (~> 3.17.0.2)
+      lint_roller (~> 1.0)
+      rubocop (~> 1.66.0)
+      standard-custom (~> 1.0.0)
+      standard-performance (~> 1.5)
+    standard-custom (1.0.2)
+      lint_roller (~> 1.0)
+      rubocop (~> 1.50)
+    standard-performance (1.5.0)
+      lint_roller (~> 1.1)
+      rubocop-performance (~> 1.22.0)
+    standard-rails (1.2.0)
+      lint_roller (~> 1.0)
+      rubocop-rails (~> 2.26.0)
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
     stringio (3.1.1)
@@ -352,10 +360,11 @@ DEPENDENCIES
   puma (>= 5.0)
   rails (~> 7.2.2)
   rspec-rails
-  rubocop-rails-omakase
   selenium-webdriver
   simplecov
   sprockets-rails
+  standard (>= 1.35.1)
+  standard-rails
   stimulus-rails
   tailwindcss-rails
   turbo-rails

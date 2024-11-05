@@ -4,9 +4,9 @@ class RecipeFilter
   attr_reader :or, :and, :not
 
   def initialize(params)
-    @or = params.fetch(:ingredient_ids, {}).fetch(:or, []).reject(&:blank?)
-    @and = params.fetch(:ingredient_ids, {}).fetch(:and, []).reject(&:blank?)
-    @not = params.fetch(:ingredient_ids, {}).fetch(:not, []).reject(&:blank?)
+    @or = params.fetch(:ingredient_ids, {}).fetch(:or, []).compact_blank
+    @and = params.fetch(:ingredient_ids, {}).fetch(:and, []).compact_blank
+    @not = params.fetch(:ingredient_ids, {}).fetch(:not, []).compact_blank
   end
 
   def new_with(or_id: nil, and_id: nil, not_id: nil)
@@ -103,6 +103,6 @@ class RecipeFilter
   end
 
   def to_params
-    { ingredient_ids: { or: @or.dup, and: @and.dup, not: @not.dup } }
+    {ingredient_ids: {or: @or.dup, and: @and.dup, not: @not.dup}}
   end
 end

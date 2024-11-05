@@ -2,13 +2,12 @@
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 #
-json_file = File.read('db/recipes-en.json')
+json_file = File.read("db/recipes-en.json")
 
 data = JSON.parse(json_file)
-size = data.size
 
 categories_data = data.map do |recipe_hsh|
-  { name: recipe_hsh.fetch('category') }
+  {name: recipe_hsh.fetch("category")}
 end.uniq
 
 Category.upsert_all(categories_data, unique_by: :name)
@@ -19,28 +18,27 @@ data.each do |recipe_hsh|
   Recipe.transaction do
     transformed_image_url =
       begin
-        CGI.unescape(URI(recipe_hsh.fetch('image')).query.gsub('url=', ''))
+        CGI.unescape(URI(recipe_hsh.fetch("image")).query.gsub("url=", ""))
       rescue
-        recipe_hsh.fetch('image')
+        recipe_hsh.fetch("image")
       end
 
-
     recipe = Recipe.find_or_create_by(
-      title: recipe_hsh.fetch('title'),
-      cook_time: recipe_hsh.fetch('cook_time'),
-      prep_time: recipe_hsh.fetch('prep_time'),
-      author: recipe_hsh.fetch('author'),
+      title: recipe_hsh.fetch("title"),
+      cook_time: recipe_hsh.fetch("cook_time"),
+      prep_time: recipe_hsh.fetch("prep_time"),
+      author: recipe_hsh.fetch("author"),
       image_url: transformed_image_url,
-      rating: recipe_hsh.fetch('ratings'),
-      details: recipe_hsh.fetch('ingredients'),
-      category_id: categories.fetch(recipe_hsh.fetch('category'))
+      rating: recipe_hsh.fetch("ratings"),
+      details: recipe_hsh.fetch("ingredients"),
+      category_id: categories.fetch(recipe_hsh.fetch("category"))
     )
 
-    recipe_ingredients = recipe_hsh.fetch('ingredients').map do |ingredient_str|
+    recipe_ingredients = recipe_hsh.fetch("ingredients").map do |ingredient_str|
       ingredient_tag = TagExtractor.call(ingredient_str)
       ingredient = Ingredient.find_or_create_by(name: ingredient_tag)
 
-      { ingredient_id: ingredient.id, recipe_id: recipe.id }
+      {ingredient_id: ingredient.id, recipe_id: recipe.id}
     end
 
     RecipeIngredient.upsert_all(recipe_ingredients, unique_by: %i[ingredient_id recipe_id])

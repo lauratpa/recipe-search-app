@@ -4,8 +4,8 @@ FactoryBot.define do
     prep_time { 10 }
     cook_time { 15 }
     rating { 4.5 }
-    author { 'Test author' }
-    image_url { 'https://www.example.com/1234.jpg' }
+    author { "Test author" }
+    image_url { "https://www.example.com/1234.jpg" }
     category
   end
 

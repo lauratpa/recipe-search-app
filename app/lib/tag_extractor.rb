@@ -263,7 +263,6 @@ class TagExtractor
   def call
     return difficult_match if difficult_match
 
-
     change_dashes_to_spaces
     remove_sentences
     remove_parentheses
@@ -288,7 +287,7 @@ class TagExtractor
   attr_reader :line
 
   def change_dashes_to_spaces
-    @line = line.gsub("-", " ")
+    @line = line.tr("-", " ")
   end
 
   def remove_commas_and_dots

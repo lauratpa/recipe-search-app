@@ -29,7 +29,7 @@ class RecipesController < ApplicationController
   def show
     recipe = Recipe.find(params[:id])
 
-    render :show, locals: { recipe: recipe }
+    render :show, locals: {recipe: recipe}
   end
 
   private

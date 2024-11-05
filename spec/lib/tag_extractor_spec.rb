@@ -1,14 +1,14 @@
-require 'spec_helper'
-require './app/lib/tag_extractor'
+require "spec_helper"
+require "./app/lib/tag_extractor"
 
 RSpec.describe TagExtractor do
-  it 'extracts ingredient name' do
+  it "extracts ingredient name" do
     line = "1 cup all-purpose flour"
 
     expect(TagExtractor.call(line)).to eq("all purpose flour")
   end
 
-  it 'removes digits' do
+  it "removes digits" do
     lines = [
       "1 ½ cups of sugar",
       "⅓ cups of sugar",
@@ -18,10 +18,10 @@ RSpec.describe TagExtractor do
       "⅔ cups of sugar"
     ]
 
-    expect(lines.map { |line| TagExtractor.call(line) }.uniq).to eq([ "sugar" ])
+    expect(lines.map { |line| TagExtractor.call(line) }.uniq).to eq(["sugar"])
   end
 
-  it 'removes measurements' do
+  it "removes measurements" do
     lines = [
       "1 ½ cups of apples",
       "1 teaspoon of apples",
@@ -36,16 +36,16 @@ RSpec.describe TagExtractor do
       "1 bottle of apples"
     ]
 
-    expect(lines.map { |line| TagExtractor.call(line) }.uniq).to eq([ "apples" ])
+    expect(lines.map { |line| TagExtractor.call(line) }.uniq).to eq(["apples"])
   end
 
-  it 'removes adjectives', :aggregate_failures do
+  it "removes adjectives", :aggregate_failures do
     expect(TagExtractor.call("1 cup warm water")).to eq("water")
     expect(TagExtractor.call("1 cup fresh blueberries")).to eq("blueberries")
     expect(TagExtractor.call("¼ cup pure maple syrup")).to eq("maple syrup")
   end
 
-  it 'removes cooking methods', :aggregate_failures do
+  it "removes cooking methods", :aggregate_failures do
     expect(TagExtractor.call("3 (12 ounce) packages refrigerated biscuits dough")).to eq("biscuits dough")
     expect(TagExtractor.call("2 teaspoons ground cinnamon")).to eq("cinnamon")
     expect(TagExtractor.call("1 cup packed brown sugar")).to eq("brown sugar")
@@ -59,14 +59,14 @@ RSpec.describe TagExtractor do
     expect(TagExtractor.call("2 cups pre-cooked white corn meal (such as P.A.N.®)")).to eq("white corn meal")
     expect(TagExtractor.call("¼ cup butter, chilled cubed")).to eq("butter")
     expect(TagExtractor.call("¼ cup butter, divided")).to eq("butter")
-    expect(TagExtractor.call("¾ cup butter, melted and cooled to lukewarm",)).to eq("butter")
+    expect(TagExtractor.call("¾ cup butter, melted and cooled to lukewarm")).to eq("butter")
     expect(TagExtractor.call("3 tablespoons butter, softened")).to eq("butter")
     expect(TagExtractor.call("1 sheet frozen puff pastry, thawed")).to eq("puff pastry")
     expect(TagExtractor.call("1 lemon, zested and juiced")).to eq("lemons")
     expect(TagExtractor.call("1 cup cranberries, halved")).to eq("cranberries")
   end
 
-  it 'removes sentences', :aggregate_failures do
+  it "removes sentences", :aggregate_failures do
     expect(TagExtractor.call("6 slices turkey bacon, cut into small pieces")).to eq("turkey bacon")
     expect(TagExtractor.call("1 teaspoon ground cinnamon, or to taste")).to eq("cinnamon")
     expect(TagExtractor.call("¼ cup vegetable oil, or as needed")).to eq("vegetable oil")
@@ -83,19 +83,19 @@ RSpec.describe TagExtractor do
     expect(TagExtractor.call("2 (.25 ounce) packages quick-rising yeast (such as Fleischmann's RapidRise®)")).to eq("quick rising yeast")
   end
 
-  it 'removes Granny Smith instructions', :aggregate_failures do
+  it "removes Granny Smith instructions", :aggregate_failures do
     expect(TagExtractor.call("1 Granny Smith apple - peeled, cored and coarsely shredded")).to eq("granny smith apples")
     expect(TagExtractor.call("3 Granny Smith apples - peeled, cored and sliced")).to eq("granny smith apples")
   end
 
-  it 'saves cream of tatar and soups', :aggregate_failures do
+  it "saves cream of tatar and soups", :aggregate_failures do
     expect(TagExtractor.call("½ teaspoon cream of tartar")).to eq("cream of tartar")
     expect(TagExtractor.call("2 (10.75 ounce) cans cream of mushroom soup")).to eq("cream of mushroom soup")
     expect(TagExtractor.call("¼ cup extra virgin olive oil")).to eq("extra virgin olive oil")
     expect(TagExtractor.call("1 tablespoon extra-virgin olive oil")).to eq("extra-virgin olive oil")
   end
 
-  it 'saves almonds' do
+  it "saves almonds" do
     expect(TagExtractor.call("¼ cup unsweetened almond milk")).to eq("unsweetened almond milk")
     expect(TagExtractor.call("⅓ cup toasted slivered almonds")).to eq("almonds")
     expect(TagExtractor.call("2 cups finely ground almond flour")).to eq("almond flour")

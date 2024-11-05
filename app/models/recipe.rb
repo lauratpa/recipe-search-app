@@ -5,7 +5,7 @@ class Recipe < ApplicationRecord
 
   scope :by_rating, -> { order(rating: :desc) }
   scope :with_ingredients, ->(ingredient_ids) {
-    joins(:recipe_ingredients).where(recipe_ingredients: { ingredient_id: ingredient_ids })
+    joins(:recipe_ingredients).where(recipe_ingredients: {ingredient_id: ingredient_ids})
   }
 
   # Returns recipes with at least one matching ingredient sorted by match count and rating

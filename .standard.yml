@@ -1,0 +1,4 @@
+ignore:
+  - 'vendor/**/*'
+plugins:
+- standard-rails
