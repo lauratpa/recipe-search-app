@@ -39,7 +39,7 @@
         <span class="p-0.5">Add an optional ingredient:</span>
 
         <div>
-          <%= form_with url: search_ingredients_path(filter.to_params, operator: :or_id), method: :post, data: { search_target: "form" }, class: "" do |form| %>
+          <%= form_with url: search_ingredients_path(filter.to_params.merge(operator: :or_id)), method: :post, data: { search_target: "form" }, class: "" do |form| %>
             <div>
               <%= form.text_field :search, data: { action: "search#search" }, autocomplete: "off", class: 'text-base p-0.5' %>
             </div>
@@ -68,7 +68,7 @@
         <span class="p-0.5">Add a required ingredient:</span>
 
         <div>
-          <%= form_with url: search_ingredients_path(filter.to_params, operator: :and_id), method: :post, data: { search_target: "form" }, class: "" do |form| %>
+          <%= form_with url: search_ingredients_path(filter.to_params.merge(operator: :and_id)), method: :post, data: { search_target: "form" }, class: "" do |form| %>
             <div>
               <%= form.text_field :search, data: { action: "search#search" }, autocomplete: "off", class: 'text-base p-0.5' %>
             </div>
@@ -97,7 +97,7 @@
         <span class="p-0.5">Add an excluded ingredient:</span>
 
         <div>
-          <%= form_with url: search_ingredients_path(filter.to_params, operator: :not_id), method: :post, data: { search_target: "form" }, class: "" do |form| %>
+          <%= form_with url: search_ingredients_path(filter.to_params.merge(operator: :not_id)), method: :post, data: { search_target: "form" }, class: "" do |form| %>
             <div>
               <%= form.text_field :search, data: { action: "search#search" }, autocomplete: "off", class: 'text-base p-0.5' %>
             </div>

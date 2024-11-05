@@ -1,10 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "Ingredients", type: :request do
+  let(:category) { create(:category) }
+
   context "POST#search" do
     it "returns ingredients matching the search" do
-      category = create(:category)
-
       bananas = create(:ingredient, name: "bananas")
       apples = create(:ingredient, name: "apples")
 
@@ -21,9 +21,7 @@ RSpec.describe "Ingredients", type: :request do
     end
 
     it "does not return ingredients already chose" do
-      category = create(:category)
-
-      create(:ingredient, name: "butter")
+      butter = create(:ingredient, name: "butter")
         .tap { |ingredient| ingredient.recipes << create(:recipe, category: category) }
       peanut_butter = create(:ingredient, name: "peanut butter")
         .tap { |ingredient| ingredient.recipes << create(:recipe, category: category) }
@@ -35,7 +33,7 @@ RSpec.describe "Ingredients", type: :request do
         params: {
           search: "butter",
           ingredient_ids: {and: [peanut_butter.id], or: [buttermilk.id]},
-          operator: "or_id"
+          operator: "not_id"
         }
       )
 
@@ -43,6 +41,13 @@ RSpec.describe "Ingredients", type: :request do
       expect(response.body).to include("butter (1)")
       expect(response.body).not_to include("buttermilk")
       expect(response.body).not_to include("peanut butter")
+      expect(response.body).to include(
+        CGI.escapeHTML(
+          recipes_path(
+            {ingredient_ids: {and: [peanut_butter.id], or: [buttermilk.id], not: [butter.id]}}
+          )
+        )
+      )
     end
   end
 end
